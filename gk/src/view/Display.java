@@ -2,7 +2,6 @@ package view;
 
 import model.*;
 import controller.*;
-import model.*;
 
 import java.awt.*;
 import javax.swing.*;
@@ -14,6 +13,7 @@ import java.awt.event.ActionListener;
 public class Display extends FrameChess implements ActionListener {
     private Image chineseChess;
     private Chess chessSelect;
+    private Chess[][] initialChessState;  // Thêm biến để lưu trạng thái ban đầu
 
     private void loadImage() {
         chineseChess = new ImageIcon("chess.png").getImage();
@@ -24,6 +24,44 @@ public class Display extends FrameChess implements ActionListener {
         MovingAdapter ma = new MovingAdapter();
         addMouseMotionListener(ma);
         addMouseListener(ma);
+
+        // Lưu trạng thái ban đầu của bàn cờ
+        initialChessState = new Chess[10][11];
+        copyChessState(chessCheck, initialChessState);
+    }
+
+    // Phương thức sao chép trạng thái bàn cờ
+    private void copyChessState(Chess[][] source, Chess[][] destination) {
+        for (int i = 1; i <= 9; ++i) {
+            for (int j = 1; j <= 10; ++j) {
+                if (source[i][j] != null) {
+                    destination[i][j] = (Chess) source[i][j].clone();
+                }
+            }
+        }
+    }
+
+    // Phương thức khôi phục lại trạng thái ban đầu
+    private void resetGameState() {
+        copyChessState(initialChessState, chessCheck);
+
+        chessRed.clear();
+        chessBlack.clear();
+
+        // Cập nhật lại danh sách các quân cờ
+        for (int i = 1; i <= 9; ++i) {
+            for (int j = 1; j <= 10; ++j) {
+                if (chessCheck[i][j] != null) {
+                    if (chessCheck[i][j].getStatus().equals("RED")) {
+                        chessRed.add(chessCheck[i][j]);
+                    } else {
+                        chessBlack.add(chessCheck[i][j]);
+                    }
+                }
+            }
+        }
+
+        repaint();
     }
 
     private void doDrawing(Graphics g) {
@@ -115,6 +153,7 @@ public class Display extends FrameChess implements ActionListener {
             }
         }
     }
+
     public void checkGameEnd() {
         String result = checkGameOver();
         if (result != null) {
@@ -122,24 +161,10 @@ public class Display extends FrameChess implements ActionListener {
                     "Game Over", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new Object[]{"OK", "Hủy"}, "OK");
 
             if (option == 0) {  // 0 là lựa chọn "OK"
-                resetGame();  // Reset lại bàn cờ
+                resetGameState();  // Khôi phục lại trạng thái ban đầu
             } else if (option == 1) {  // 1 là lựa chọn "Hủy"
                 System.exit(0);  // Thoát chương trình
             }
         }
-    }
-
-    private void resetGame() {
-        // Thực hiện reset bàn cờ về trạng thái ban đầu
-        chessRed.clear();
-        chessBlack.clear();
-        addInitialChessPieces();
-        updateChessCheck();
-        repaint();
-    }
-
-    private void addInitialChessPieces() {
-    }
-    private void updateChessCheck() {
     }
 }
