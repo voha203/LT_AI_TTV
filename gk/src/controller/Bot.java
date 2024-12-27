@@ -45,10 +45,10 @@ public class Bot extends FrameChess {
                 }
             }
         }
-
+        String result = checkGameOver();
+        if (result != null) return;
         // Cập nhật lại giao diện hiển thị
         display.repaint();
         display.checkGameEnd();
-
     }
 }

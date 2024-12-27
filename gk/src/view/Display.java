@@ -105,6 +105,8 @@ public class Display extends FrameChess implements ActionListener {
                         checkAction = false;
                         botTurn = true;
                         chessSelect = null;
+                        String result = checkGameOver();
+                        if (result != null) return;
                     }
                 }
 
