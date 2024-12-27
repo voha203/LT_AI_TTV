@@ -3,7 +3,7 @@ package model;
 import javax.swing.*;
 import java.util.ArrayList;
 
-public class FrameChess extends JPanel {
+public abstract class FrameChess extends JPanel {
     protected boolean checkAction = false;
 
     protected int[] pointOfChessX = new int[10];
@@ -335,4 +335,5 @@ public class FrameChess extends JPanel {
         return null;
     }
 
+    public abstract void checkGameEnd();
 }

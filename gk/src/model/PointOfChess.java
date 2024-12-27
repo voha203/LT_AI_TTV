@@ -1,11 +1,8 @@
 package model;
 
-public class PointOfChess {
+public class PointOfChess implements Cloneable {
     private int x;
     private int y;
-
-    public PointOfChess() {
-    }
 
     public PointOfChess(int x, int y) {
         this.x = x;
@@ -20,16 +17,12 @@ public class PointOfChess {
         return y;
     }
 
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
     @Override
-    public String toString() {
-        return "x: " + this.x + ", y:" + this.y;
+    public Object clone() {
+        try {
+            return (PointOfChess) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
     }
 }

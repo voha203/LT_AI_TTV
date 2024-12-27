@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
 public class Display extends FrameChess implements ActionListener {
     private Image chineseChess;
     private Chess chessSelect;
-    private Chess[][] initialChessState;  // Thêm biến để lưu trạng thái ban đầu
+    private Chess[][] initialChessState;  // Lưu trạng thái ban đầu của bàn cờ
 
     private void loadImage() {
         chineseChess = new ImageIcon("chess.png").getImage();
@@ -30,12 +30,28 @@ public class Display extends FrameChess implements ActionListener {
         copyChessState(chessCheck, initialChessState);
     }
 
+    @Override
+    public void checkGameEnd() {
+        String result = checkGameOver();
+        if (result != null) {
+            // Hiển thị hộp thoại chỉ với nút "Hủy"
+            int option = JOptionPane.showOptionDialog(this, result,
+                    "Game Over", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new Object[]{"Hủy"}, "Hủy");
+
+            // Nếu người chơi chọn "Hủy", thoát khỏi chương trình
+            if (option == 0) {  // 0 là lựa chọn "Hủy"
+                System.exit(0);  // Thoát chương trình
+            }
+        }
+    }
+
+
     // Phương thức sao chép trạng thái bàn cờ
     private void copyChessState(Chess[][] source, Chess[][] destination) {
         for (int i = 1; i <= 9; ++i) {
             for (int j = 1; j <= 10; ++j) {
                 if (source[i][j] != null) {
-                    destination[i][j] = (Chess) source[i][j].clone();
+                    destination[i][j] = (Chess) source[i][j].clone();  // Clone each chess piece to avoid reference issues
                 }
             }
         }
@@ -43,12 +59,14 @@ public class Display extends FrameChess implements ActionListener {
 
     // Phương thức khôi phục lại trạng thái ban đầu
     private void resetGameState() {
+        // Khôi phục lại trạng thái bàn cờ từ ban đầu
         copyChessState(initialChessState, chessCheck);
 
+        // Xóa tất cả quân cờ trong danh sách
         chessRed.clear();
         chessBlack.clear();
 
-        // Cập nhật lại danh sách các quân cờ
+        // Cập nhật lại danh sách các quân cờ đỏ và đen từ trạng thái ban đầu
         for (int i = 1; i <= 9; ++i) {
             for (int j = 1; j <= 10; ++j) {
                 if (chessCheck[i][j] != null) {
@@ -61,6 +79,7 @@ public class Display extends FrameChess implements ActionListener {
             }
         }
 
+        // Vẽ lại bàn cờ
         repaint();
     }
 
@@ -68,26 +87,29 @@ public class Display extends FrameChess implements ActionListener {
         Graphics2D g2d = (Graphics2D) g;
         g2d.drawImage(chineseChess, 0, 0, null);
 
+        // Vẽ các quân cờ đỏ
         for (Chess chess : chessRed) {
             g2d.drawImage(chess.getImageChessR(), pointOfChessX[chess.getPoint().getX()] - 340,
                     pointOfChessY[chess.getPoint().getY()] - 55, null);
         }
 
+        // Vẽ các quân cờ đen
         for (Chess chess : chessBlack) {
             g2d.drawImage(chess.getImageChessB(), pointOfChessX[chess.getPoint().getX()] - 340,
                     pointOfChessY[chess.getPoint().getY()] - 55, null);
         }
 
-        if (checkAction == true && chessSelect != null) {
+        // Kiểm tra nếu có quân cờ được chọn để di chuyển
+        if (checkAction && chessSelect != null) {
             canGo = chessSelect.pointCanGo(chessCheck, chessSelect.getPoint().getX(), chessSelect.getPoint().getY(),
                     g2d, pointOfChessX, pointOfChessY);
             canEat = chessSelect.pointCanEat(chessCheck, chessSelect.getPoint().getX(), chessSelect.getPoint().getY(),
                     g2d, pointOfChessX, pointOfChessY);
         }
 
+        // Nếu đến lượt bot, tính toán nước đi
         if (botTurn) {
             calculateBestMove();
-
             botTurn = false;
             repaint();
         }
@@ -123,10 +145,9 @@ public class Display extends FrameChess implements ActionListener {
                     checkAction = true;
                 }
 
-                if (checkAction == true) {
-                    if (canGo[pointX][pointY] == true) {
+                if (checkAction) {
+                    if (canGo[pointX][pointY]) {
                         chessSelect.setPoint(new PointOfChess(pointX, pointY));
-
                         editChess();
                         remakeCanGo();
                         checkAction = false;
@@ -134,10 +155,9 @@ public class Display extends FrameChess implements ActionListener {
                         chessSelect = null;
                     }
 
-                    if (canEat[pointX][pointY] == true) {
+                    if (canEat[pointX][pointY]) {
                         chessBlack.remove(chessCheck[pointX][pointY]);
                         chessSelect.setPoint(new PointOfChess(pointX, pointY));
-
                         editChess();
                         remakeCanEat();
                         checkAction = false;
@@ -150,20 +170,6 @@ public class Display extends FrameChess implements ActionListener {
 
                 repaint();
                 checkGameEnd();
-            }
-        }
-    }
-
-    public void checkGameEnd() {
-        String result = checkGameOver();
-        if (result != null) {
-            int option = JOptionPane.showOptionDialog(this, result,
-                    "Game Over", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new Object[]{"OK", "Hủy"}, "OK");
-
-            if (option == 0) {  // 0 là lựa chọn "OK"
-                resetGameState();  // Khôi phục lại trạng thái ban đầu
-            } else if (option == 1) {  // 1 là lựa chọn "Hủy"
-                System.exit(0);  // Thoát chương trình
             }
         }
     }

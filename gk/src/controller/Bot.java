@@ -6,7 +6,7 @@ import view.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Bot extends FrameChess {
+public abstract class Bot extends FrameChess {
 
     private Display display;
 

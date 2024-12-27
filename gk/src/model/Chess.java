@@ -16,7 +16,7 @@ public class Chess implements Cloneable {
     public Chess(Chess another) {
         this.imageChessB = another.getImageChessB();
         this.imageChessR = another.getImageChessR();
-        this.point = another.getPoint();
+        this.point = (PointOfChess) another.getPoint().clone();  // Clone point to avoid shared references
         this.status = another.getStatus();
         this.value = another.getValue();
     }
@@ -54,12 +54,12 @@ public class Chess implements Cloneable {
     }
 
     public boolean[][] pointCanGo(Chess[][] chessCheck, int x, int y, Graphics2D g2d, int[] pointOfChessX,
-            int[] pointOfChessY) {
+                                  int[] pointOfChessY) {
         return null;
     }
 
     public boolean[][] pointCanEat(Chess[][] chessCheck, int x, int y, Graphics2D g2d, int[] pointOfChessX,
-            int[] pointOfChessY) {
+                                   int[] pointOfChessY) {
         return null;
     }
 
@@ -72,13 +72,15 @@ public class Chess implements Cloneable {
     }
 
     @Override
-	public Object clone() {
-	    try {
-	        return (Chess) super.clone();
-	    } catch (CloneNotSupportedException e) {
-	        return "!";
-	    }
-	}
+    public Object clone() {
+        try {
+            Chess cloned = (Chess) super.clone();
+            cloned.point = (PointOfChess) this.point.clone();  // Clone point to avoid shared reference
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
+    }
 
     @Override
     public String toString() {
